@@ -8,12 +8,18 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             user-select: none;
             transition: background-color 0.3s, color 0.3s;
+        }
+        @media (min-width: 1024px) {
+            body { height: 100vh; overflow: hidden; }
+        }
+        @media (max-width: 1023px) {
+            body { height: auto; overflow-y: auto; }
+            .app-container { height: auto !important; }
         }
         .mono { font-family: monospace, 'Courier New'; }
 
@@ -110,6 +116,9 @@
             main { grid-template-columns: repeat(12, 1fr); }
             .col-5 { grid-column: span 5; }
             .col-7 { grid-column: span 7; }
+        }
+        @media(max-width: 1023px) {
+            main { overflow: visible; display: flex; flex-direction: column; }
         }
 
         .panel {
@@ -273,7 +282,7 @@
 
             <!-- Controls -->
             <div style="display: flex; gap: 6px;">
-                <button onclick="playSound(); toggleMode()" id="modeToggleBtn" class="btn">Mode: Single</button>
+                <button onclick="playSound(); toggleMode()" id="modeToggleBtn" class="btn">Mode: Multi (4)</button>
                 <button onclick="playSound(); toggleTheme()" class="btn">🌓 <span id="themeLabel">Invert</span></button>
             </div>
         </header>
@@ -375,7 +384,7 @@
             <section class="col-7 panel">
                 
                 <!-- Single Mode View -->
-                <div id="singleModeView" class="panel" style="height: 100%;">
+                <div id="singleModeView" class="panel hidden" style="height: 100%;">
                     
                     <!-- Birthday Milestones -->
                     <div class="card" style="height: 260px; display: flex; flex-direction: column;">
@@ -422,7 +431,7 @@
                 </div>
 
                 <!-- Multi-Person Comparison View -->
-                <div id="multiModeView" class="panel hidden" style="height: 100%;">
+                <div id="multiModeView" class="panel" style="height: 100%;">
                     <div class="card" style="height: 100%; display: flex; flex-direction: column;">
                         <div class="card-header">
                             <span>Up to 4 Persons Age Comparison Sheet (DD/MM/YYYY & 12h Clock)</span>
@@ -588,8 +597,8 @@
             }
         }
 
-        // Mode Toggle
-        let isMultiMode = false;
+        // Mode Toggle (Starts in Multi Mode = true)
+        let isMultiMode = true;
         function toggleMode() {
             isMultiMode = !isMultiMode;
             const singleView = document.getElementById('singleModeView');
@@ -604,6 +613,7 @@
                 multiView.classList.add('hidden');
                 singleView.classList.remove('hidden');
                 modeToggleBtn.innerText = 'Mode: Single';
+                calculateAge();
             }
         }
 
@@ -786,7 +796,7 @@
             const birthDate = birth.getDate();
             const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-            const maxYear = Math.max(currentYear + 5, birthYear + 80);
+            const maxYear = Math.max(currentYear + 5, birthYear + 100);
             for (let y = birthYear; y <= maxYear; y++) {
                 const bday = new Date(y, birthMonth, birthDate);
                 const ageNum = y - birthYear;
